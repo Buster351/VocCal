@@ -1,0 +1,309 @@
+' Gambas class file
+
+Public Con As New Connection
+Public SelPanel As Integer
+Public SelTown As Integer
+Public selected_panel As Result
+Public selected_town As Result
+Public oVoc As Float
+Public TempAdjVoc As Float
+
+
+Public Sub ToolButton1_Click()
+
+  AddPanel.ShowModal
+  FillList
+
+End
+
+Public Sub Form_Open()
+
+
+FMain.text = "Voc Cal " & Application.Version
+ If Not Exist(User.Home &/ "VocCal") Then
+     Try Mkdir User.Home &/ "VocCal"
+ 
+     If Error Then 
+        Message.Error(Subst$(("Couldn't create the directory &1"), User.Home &/ "VocCal" & Error.Code))
+        Quit
+     Else
+        Try Copy "voc.sqlite3" To User.Home &/ "VocCal/voc.sqlite3"
+        If Error Then
+           Message.Error(Subst$(("Couldn't copy the file &1"), User.Home &/ "VocCal/voc.sqlite3"))
+        Endif
+        Wait
+     Endif
+ 
+  Endif ' Not Exist(User.Home &/ "StructDB")
+  
+  
+                Try Con.Close()             ' Cierra la conexion el try permite falle sin error
+               Con.Type = "sqlite3"        ' Define el tipo de Conexion
+                Con.Host = User.home ' Host sera la ruta en donde esta el archivo de la db sqlite
+                Con.Name = "/VocCal/voc.sqlite3"    ' nombre de la base de datos es el nombre del archivo base de datos
+                Con.Open()                  ' Activamos y Abrimos la conexion, el try es para que permita un error
+
+                Print "Connected : " & Con.Opened ' Devolvera TRUE o FALSE segun si "try $con.Open()" fue exitoso en "conectarodbc()"
+If Settings.Exist("Battery") = False Then
+  Settings["Battery/Type[0]"] = "Power Plus"
+  Settings["Battery/Type[1]"] = "Samsung"
+  Settings["Battery/Type[2]"] = "Tesla"
+  Settings["Battery/Type[3]"] = "Other"
+Endif
+FillList
+End
+
+
+Public Sub FillList()
+  
+  Dim r As Result
+  
+  r = Con.Find("panels")
+  ListView1.Clear
+  
+  For Each r
+    ListView1.Add(r!id, r!man & " " & r!watt & " W " & r!model)
+  Next
+  
+End
+
+Public Sub ListView1_Select()
+
+  Dim r As Result
+  
+  
+  SelPanel = ListView1.Current.Key   ' check this is data base key?? it should be see ( Fill List ) Above 
+  
+r = Con.Find("panels", "id=&1", SelPanel)
+selected_panel = r
+
+Label4.Text = (SpinBox1.Value * CFloat(r!voc)) & " Vdc"
+Label6.Text = r!isc & " Adc"
+Label8.Text = SpinBox1.Value * CInt(r!watt) 
+
+Label13.Text = (SpinBox2.Value * CFloat(r!voc)) & " Vdc"
+Label14.Text = r!isc & " Adc"
+Label16.Text = SpinBox2.Value * CInt(r!watt) 
+
+Label20.Text = (SpinBox3.Value * CFloat(r!voc)) & " Vdc"
+Label21.Text = r!isc & " Adc"
+Label23.Text = SpinBox3.Value * CInt(r!watt) 
+
+Label30.Text = (SpinBox4.Value * CFloat(r!voc)) & " Vdc"
+Label31.Text = r!isc & " Adc"
+Label33.Text = SpinBox4.Value * CInt(r!watt) 
+End
+
+Public Sub SpinBox1_Change()
+  
+  ListView1_Select
+  StringFuseReq
+  fillText
+End
+
+Public Sub ListView1_Click()
+
+  Button1.Enabled = True
+  ' String fuse button enabled
+  Button2.Enabled = True
+  SpinBox1.Enabled = True
+  SpinBox2.Enabled = True
+  SpinBox3.Enabled = True
+  SpinBox4.Enabled = True
+  TextBox1.Enabled = True
+  Balloon("Now Select a suburb", TextBox1)
+  TextBox1.SetFocus
+End
+
+Public Sub Button1_Click()
+
+  Pfixing.ShowModal
+End
+
+
+
+
+Public Sub TextBox1_KeyPress()
+
+  
+
+End
+
+Public Sub TextBox1_Change()
+Dim r As Result
+
+  If Len(TextBox1.Text) > 2 Then
+    'r = $con.Find("datafile_Sheet1", "Address LIKE &1", "%" & t & "%")
+    r = Con.Find("australian_postcodes", "locality LIKE &1", "%" & TextBox1.Text & "%")    
+  
+
+  ListView2.Clear
+
+  For Each r
+    ListView2.Add(r!id, r!locality & " " & r!postcode)
+  Next
+  
+  Endif
+End
+
+Public Sub ListView2_Select()
+
+  Dim r As Result
+  
+  Button4.Enabled = True
+  
+  SelTown = ListView2.Current.Key
+  r = Con.Find("australian_postcodes", "id=&1", SelTown)
+  If r!min_temp = "" Then
+   AddTemp.ShowModal
+   
+  
+  Endif
+  r = FMain.Con.Find("australian_postcodes", "id=&1", FMain.SelTown)
+  If r!min_temp <> Null
+  FMain.TempAdjVoc = Round(FMain.GetTempAdjVoc(FMain.selected_panel, r!min_temp), -2)
+  Endif 
+  Label10.Text = "Min Temp = " & r!min_temp & "°C"
+  Label26.Text = "Temp Adj Voc = " & TempAdjVoc & " VDC"
+  Label27.text = "Original Voc = " & selected_panel!voc
+  selected_town = r
+End
+
+Public Sub SpinBox2_Change()
+
+  ListView1_Select
+  StringFuseReq
+  fillText
+  
+End 
+
+Public Sub Button2_Click()
+
+  Stringfuse.ShowModal
+
+End
+
+
+
+Public Sub SpinBox3_Change()
+
+  ListView1_Select
+  StringFuseReq
+  fillText
+End
+
+Public Sub StringFuseReq()
+  
+  If SpinBox3.Value > 0 Then
+    If (2 * selected_panel!isc) > selected_panel!fuse Then
+      Label25.Text = "Fuse Required " & "Min Fuse Size=" & (1.5 * selected_panel!isc) & " A" & " Max Fuse Size=" & (2.4 * selected_panel!isc) & " A"
+    Endif
+  Else
+    Label25.Text = ""        
+  Endif
+End
+
+
+Public Sub ListView2_Click()
+
+  
+
+End
+
+Public Function CalVoltCo(voc As Float, co As Float) As Float
+  
+  Dim r As Float
+  r = voc * (co / 100)
+  Return r
+  
+  
+End
+
+Public Function CalVocTemp(stc As Integer, mintemp As Float, voltco As Float) As Float
+  
+  Dim r As Float
+  r = (mintemp - stc) * voltco
+  Return r
+  
+  
+End
+
+
+Public Function GetTempAdjVoc(panelinfo As Result, mintemp As Float) As Float
+  Dim cof As Float
+  Dim vtemp As Float
+  
+  cof = CalVoltCo(panelinfo!voc, panelinfo!temp_co)
+  vtemp = CalVocTemp(panelinfo!stc_temp, mintemp, cof)
+  oVoc = panelinfo!voc
+  Return panelinfo!voc + vtemp
+  
+  
+  
+End
+
+Public Sub Button4_Click()
+fillText
+
+End
+
+
+Public Sub fillText()
+  
+  Dim maxIsc As Float
+  
+  If selected_town = Null Then
+    Message("Select Locale First")
+  Else
+    TextArea1.text = "Min Temp " & selected_town!min_temp & "°C" & Chr(13)
+    TextArea1.Text = TextArea1.text & "Temp Adj Voc " & TempAdjVoc & " Vdc" & Chr(13)
+
+  If SpinBox1.Value > 0 Then
+    TextArea1.Text = TextArea1.Text & "String 1 = " & SpinBox1.Value & " X " & selected_panel!watt & " W Panels" & " Voc = " & (SpinBox1.Value * TempAdjVoc) & " VDC" & Chr(13)
+    maxIsc = maxIsc + selected_panel!isc
+    
+  Endif
+
+  If SpinBox2.Value > 0 Then
+    TextArea1.Text = TextArea1.Text & "String 2 = " & SpinBox2.Value & " X " & selected_panel!watt & " W Panels" & " Voc = " & (SpinBox2.Value * TempAdjVoc) & " VDC" & Chr(13)
+     maxIsc = maxIsc + selected_panel!isc 
+   Endif
+  
+  If SpinBox3.Value > 0 Then
+    TextArea1.Text = TextArea1.Text & "String 3 = " & SpinBox3.Value & " X " & selected_panel!watt & " W Panels" & " Voc = " & (SpinBox3.Value * TempAdjVoc) & " VDC" & Chr(13)
+     maxIsc = maxIsc + selected_panel!isc
+    
+  Endif
+  If SpinBox4.Value > 0 Then
+    TextArea1.Text = TextArea1.Text & "String 4 = " & SpinBox4.Value & " X " & selected_panel!watt & " W Panels" & " Voc = " & (SpinBox4.Value * TempAdjVoc) & " VDC" & Chr(13)
+     maxIsc = maxIsc + selected_panel!isc
+    
+  Endif
+  TextArea1.Text = TextArea1.Text & "Total Isc = " & maxIsc & " A"
+
+  Endif
+  TextArea1.Refresh
+  Wait 
+  
+  
+End
+
+Public Sub Button3_Click()
+
+  Clipboard.Copy(TextArea1.text, "text/html")
+
+End
+
+Public Sub ToolButton2_Click()
+
+  Products.ShowModal
+
+End
+
+Public Sub SpinBox4_Change()
+
+  ListView1_Select
+  StringFuseReq
+  fillText
+
+End

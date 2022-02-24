@@ -1,0 +1,224 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,157,108)
+  { ToolButton1 ToolButton
+    MoveScaled(1,1,9,7)
+    ToolTip = ("Add Panel")
+    Picture = Picture["solar-panel(1).png"]
+  }
+  { Label1 Label
+    MoveScaled(1,10,21,5)
+    Text = ("Select Panel")
+  }
+  { ListView1 ListView
+    MoveScaled(1,16,62,30)
+  }
+  { Button1 Button
+    MoveScaled(12,1,10,8)
+    Enabled = False
+    Text = ("Panel\nFixing")
+  }
+  { Frame1 Frame
+    MoveScaled(67,1,62,11)
+    Background = Color.LightGray
+    Text = ("String 1")
+    { SpinBox1 SpinBox
+      MoveScaled(2,4,15,5)
+      Enabled = False
+      MinValue = 1
+      MaxValue = 1000
+      Value = 1
+    }
+    { Label2 Label
+      MoveScaled(2,1,16,3)
+      Text = ("Number Of Panels")
+    }
+    { Label3 Label
+      MoveScaled(19,1,6,3)
+      Text = ("Voc")
+    }
+    { Label4 Label
+      MoveScaled(19,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label6 Label
+      MoveScaled(33,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label7 Label
+      MoveScaled(48,1,9,3)
+      Text = ("Watts")
+    }
+    { Label8 Label
+      MoveScaled(48,5,12,4)
+      Font = Font["Bold,12"]
+    }
+    { Label5 Label
+      MoveScaled(33,1,7,3)
+      Text = ("Isc")
+    }
+  }
+  { Label9 Label
+    MoveScaled(1,47,10,4)
+    Text = ("Locality")
+  }
+  { TextBox1 TextBox
+    MoveScaled(12,47,24,4)
+    Enabled = False
+  }
+  { ListView2 ListView
+    MoveScaled(1,53,62,36)
+  }
+  { Label10 Label
+    MoveScaled(2,89,16,4)
+  }
+  { Frame2 Frame
+    MoveScaled(67,13,62,11)
+    Background = Color.LightGray
+    Text = ("String 2")
+    { SpinBox2 SpinBox
+      MoveScaled(2,4,15,5)
+      Enabled = False
+      MaxValue = 1000
+    }
+    { Label11 Label
+      MoveScaled(2,1,16,3)
+      Text = ("Number Of Panels")
+    }
+    { Label12 Label
+      MoveScaled(19,1,6,3)
+      Text = ("Voc")
+    }
+    { Label13 Label
+      MoveScaled(19,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label14 Label
+      MoveScaled(33,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label15 Label
+      MoveScaled(48,1,9,3)
+      Text = ("Watts")
+    }
+    { Label16 Label
+      MoveScaled(48,5,12,4)
+      Font = Font["Bold,12"]
+    }
+    { Label17 Label
+      MoveScaled(33,1,7,3)
+      Text = ("Isc")
+    }
+  }
+  { Button2 Button
+    MoveScaled(24,1,9,8)
+    Enabled = False
+    Text = ("String\nFuse")
+  }
+  { Frame3 Frame
+    MoveScaled(67,25,62,11)
+    Background = Color.LightGray
+    Text = ("String 3")
+    { SpinBox3 SpinBox
+      MoveScaled(2,4,15,5)
+      Enabled = False
+      MaxValue = 1000
+    }
+    { Label18 Label
+      MoveScaled(2,1,16,3)
+      Text = ("Number Of Panels")
+    }
+    { Label19 Label
+      MoveScaled(19,1,6,3)
+      Text = ("Voc")
+    }
+    { Label20 Label
+      MoveScaled(19,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label21 Label
+      MoveScaled(33,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label22 Label
+      MoveScaled(48,1,9,3)
+      Text = ("Watts")
+    }
+    { Label23 Label
+      MoveScaled(48,5,12,4)
+      Font = Font["Bold,12"]
+    }
+    { Label24 Label
+      MoveScaled(33,1,7,3)
+      Text = ("Isc")
+    }
+  }
+  { Label25 Label
+    MoveScaled(67,61,62,5)
+    Font = Font["Bold,+1"]
+  }
+  { TextArea1 TextArea
+    MoveScaled(67,72,62,35)
+  }
+  { Label26 Label
+    MoveScaled(2,93,40,3)
+  }
+  { Label27 Label
+    MoveScaled(2,97,42,3)
+  }
+  { Button4 Button
+    MoveScaled(67,67,10,4)
+    Enabled = False
+    Text = ("Do It")
+  }
+  { Button3 Button
+    MoveScaled(78,67,22,4)
+    Text = ("Copy To Clipboard")
+  }
+  { ToolButton2 ToolButton
+    MoveScaled(34,1,11,8)
+    Text = ("Product \nData Base")
+  }
+  { Frame4 Frame
+    MoveScaled(67,37,62,11)
+    Background = Color.LightGray
+    Text = ("String 3")
+    { SpinBox4 SpinBox
+      MoveScaled(2,4,15,5)
+      Enabled = False
+      MaxValue = 1000
+    }
+    { Label28 Label
+      MoveScaled(2,1,16,3)
+      Text = ("Number Of Panels")
+    }
+    { Label29 Label
+      MoveScaled(19,1,6,3)
+      Text = ("Voc")
+    }
+    { Label30 Label
+      MoveScaled(19,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label31 Label
+      MoveScaled(33,5,13,4)
+      Font = Font["Bold,12"]
+    }
+    { Label32 Label
+      MoveScaled(48,1,9,3)
+      Text = ("Watts")
+    }
+    { Label33 Label
+      MoveScaled(48,5,12,4)
+      Font = Font["Bold,12"]
+    }
+    { Label34 Label
+      MoveScaled(33,1,7,3)
+      Text = ("Isc")
+    }
+  }
+  { Frame5 Frame
+    MoveScaled(67,50,62,11)
+  }
+}

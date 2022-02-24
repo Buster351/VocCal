@@ -1,0 +1,208 @@
+' Gambas class file
+
+Public PanelResult As Result
+Public Scale As Float = 0.3
+Public ScaleT As Float = 0.1
+
+Public pwidth As Float ' panel with
+Public pheight As Float ' panel height
+Public pmin As Float 
+Public pmax As Float
+Public sstartx As Float
+Public sstarty As Float
+Public overhang As Float ' over hang of panel past screw line
+Public ptheight As Float ' panel tilt height
+Public ptfheight As Float = 100 ' panel front tilt foot height
+Public tiltsx As Integer ' tilt panel start x
+Public tiltsy As Integer  ' tilt panel start y
+Public screwline As Float = 1000 ' distance between screw lines
+Public theta As Float
+
+
+Public Sub Form_Open()
+
+  PanelResult = FMain.Con.Find("panels", "id=&1", FMain.SelPanel)
+  pheight = PanelResult!panellen
+  pwidth = PanelResult!panelwid
+  pmin = PanelResult!minfix
+  pmax = PanelResult!maxfix
+  
+  ptheight = SpinBox2.Value
+  SpinBox1.Value = screwline
+  
+  tiltsx = DrawingArea2.ClientWidth / 2
+  tiltsy = DrawingArea2.ClientHeight / 2
+  
+  Label1.text = "Panel Lenght = " & CStr(pheight) & " mm"
+  Label2.text = "Panel Width = " & CStr(pwidth) & " mm"
+  Label3.Text = "Panel Min Fixing Point = " & CStr(pmin) & " mm"
+  Label4.Text = "Panel Max Fixing Point = " & CStr(pmax) & " mm"
+  Cal_over_hang
+  DrawingArea1.Refresh
+End
+
+Public Sub DrawingArea1_Draw()
+Dim sheight As Float
+Dim swidth As Float
+Dim sspacing As Float
+Dim smin As Float
+Dim smax As Float
+
+sheight = pheight * Scale
+swidth = pwidth * Scale
+sstartx = (DrawingArea1.Width - swidth) / 2
+sstarty = (DrawingArea1.Height - sheight) / 2  
+sspacing = SpinBox1.Value * Scale
+smin = pmin * Scale
+smax = pmax * Scale
+
+Draw.Rect(sstartx, sstarty, swidth, sheight)
+Draw.FillRect(sstartx, sstarty + smin, swidth, smax - smin, Color.Green) ' Draw top goldilocks zone
+Draw.FillRect(sstartx, (sstarty + sheight) - smax, swidth, smax - smin, Color.Green)
+Draw.Text(PanelResult!man, 50, 200)
+Draw.Text(PanelResult!model, 10, 250)
+' draw the screw lines
+Draw.Foreground = Color.Red
+Draw.Line(0, (sheight / 2) - (sspacing / 2) + sstarty, DrawingArea1.Width, sheight / 2 - sspacing / 2 + sstarty)
+Draw.Line(0, sheight / 2 + sspacing / 2 + sstarty, DrawingArea1.Width, sheight / 2 + sspacing / 2 + sstarty)
+Draw.Line(0, sstarty / 2, 30, sstarty / 2)
+' Draw the measurments
+Draw.Foreground = Color.Blue
+Draw.Line(sstartx + swidth + 10, sstarty, sstartx + swidth + 60, sstarty)
+DrawingArea2.Refresh
+End
+
+Public Sub SpinBox1_Change()
+  screwline = SpinBox1.Value
+  Cal_over_hang
+  DrawingArea1.Refresh
+
+End
+
+Public Sub Cal_over_hang()
+  
+overhang = (pheight - screwline) / 2
+ValueBox1.Value = overhang
+  
+  
+End
+
+Public Sub Button1_Click()
+
+  EditPanel.PanelId = FMain.SelPanel
+  EditPanel.ShowModal
+  
+
+End
+
+
+
+Public Sub DrawingArea2_Draw()
+Dim psx As Float
+Dim psy As Float
+Dim pex As Float
+Dim pey As Float
+Dim a As Integer = 60
+Dim radians As Float 
+  ' draw panel between screw line
+  Draw.Line(tiltsx - Convt(screwline / 2), tiltsy - Convt(ptheight), tiltsx + Convt(screwline / 2), tiltsy - convt(ptfheight))
+  ' draw screw lines
+  'front
+  Draw.Foreground = Color.Red
+  Draw.Line(tiltsx + Convt(screwline / 2), tiltsy, tiltsx + Convt(screwline / 2), tiltsy - Convt(ptfheight))
+  'Rear
+  'Draw.Line(((pheight - overhang) * ScaleT) + 10, tiltsy - (ptheight * ScaleT), ((pheight - overhang) * ScaleT) + 10, tiltsy)
+  
+  Draw.Line(tiltsx - Convt(screwline / 2), tiltsy, tiltsx - Convt(screwline / 2), tiltsy - Convt(ptheight))
+  'Roof
+  Draw.Foreground = Color.Blue
+  Draw.Line(0, tiltsy, DrawingArea2.Width, tiltsy)
+  
+  'Draw Panel With Angle
+  
+  
+  ' psx = tiltsx * Cos(Rad(a)) + Convt(pheight / 2)
+  ' psy = tiltsy * Sin(Rad(a)) + Convt(pheight / 2)
+  ' pex = psx * Cos(Rad(a)) - Convt(pheight / 2)
+  ' pey = psy * Sin(Rad(a)) - Convt(pheight / 2)
+  
+theta = GetAngle()
+radians = Rad(theta + 90)
+
+psx = tiltsx - Convt(pheight / 2) * Sin(radians)
+psy = (tiltsy - SpinBox4.Value) + Convt(pheight / 2) * Cos(radians)
+pex = tiltsx + Convt(pheight / 2) * Sin(radians)
+pey = (tiltsy - SpinBox4.Value) - Convt(pheight / 2) * Cos(radians)
+
+
+'Draw.Line(sx, sy, ox, oy)
+  Draw.Line(psx, psy, pex, pey)
+  Label11.Text = PanelHeight(pheight, GetAngle())
+  Label13.text = (Round(PanelHeight(pheight, GetAngle()) * 2.1)) & " mm" 
+End
+
+Public Sub SpinBox2_Change()
+
+  ptheight = SpinBox2.Value
+  Label9.text = GetAngle()
+  DrawingArea2.Refresh
+  
+
+End
+
+Public Function Convt(value As Float) As Float
+  
+  Return value * ScaleT
+  
+  
+End
+
+' 'Dim RadAngle As Double = v_dAngle * (Math.PI / 180)
+' 
+'     'Get StartPoint
+'     Dim stPt As New ClsNode
+'     stPt.X = 2000 * Math.Cos(RadAngle) + v_center.X
+'     stPt.Y = 2000 * Math.Sin(RadAngle) + v_center.Y
+' 
+'     'Get EndPoint
+'     Dim edpt As New ClsNode
+'     edpt.X = -2000 * Math.Cos(RadAngle) + v_center.X
+'     edpt.Y = -2000 * Math.Sin(RadAngle) + v_center.Y
+' 
+'     Return New ClsNode() {stPt, edpt}.ToList
+' 
+
+Public Sub Slider1_Change()
+
+  
+End
+
+Public Sub SpinBox3_Change()
+
+  ptfheight = SpinBox3.Value
+  DrawingArea2.Refresh
+
+End
+Public Function GetAngle() As Float
+  
+  Return Deg(ATan((ptheight - ptfheight) / screwline))
+  
+End
+
+
+Public Sub SpinBox4_Change()
+
+  DrawingArea2.Refresh
+
+End
+
+Public Function PanelHeight(pl As Float, ang As Float) As Float
+  
+  Dim i As Float
+  
+  i = Sin(Rad(ang)) * pl
+  Return i
+  
+  
+End
+
